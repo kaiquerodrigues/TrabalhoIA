@@ -13,14 +13,15 @@
 	height: 2em;
 }
 
-.board .empty {
+.board .light {
 	background: #006600;
 }
 
-.board .white {
-        background: #FFFFFF;
+.board .light:hover {
+	background: #000000;
 }
 
-.board .black {
-        background: #000000;
+#othello-canvas {
+	border: 2px solid;
+	background: #006600;
 }

@@ -1,96 +1,52 @@
-var dimension = 8;
-var pieces = initBoard();
-var turn =0;
-var validPlays = [];
+//Global Variables
 
-function play(element) {
-    validPlays = calculateValidPlays();
-    if (turn==0){
-        element.className = "white";
-    }
-    if (turn==1){
-        element.className = "black";
-    }
-    turn = (turn +1) % 2;
+var canvas = document.getElementById("othello-canvas"); 
+var ctx = canvas.getContext("2d"); 
+//Its not necessary to get height because the canvas is n x n.
+var length = canvas.width;
+//Defines the board division: 4x4, 8x8...
+var n = 8;
+var pieceSize = length / n;
+
+//Initialization
+
+//Draw the board
+for (var i = 0; i < n - 1; i++) {
+	var pos = pieceSize * (i + 1);
+	ctx.beginPath();
+	ctx.moveTo(pos, 0);
+	ctx.lineTo(pos, length);
+	ctx.moveTo(0, pos);
+	ctx.lineTo(length, pos);
+	ctx.stroke();
+	ctx.closePath();
+};
+//Add listeners
+canvas.addEventListener("mouseup", makeMovement, false);
+
+//Functions
+
+function move(element) {
+    element.className = "dark";
 }
 
-function calculateValidPlays(){
-    //esvaziar o vetor de validplays
-    for (var i=0; i<dimension; i++){
-        for (var j=0; j<dimension; j++){
-            if ((turn==0 && pieces[i][j]=="white") || (turn==1 && pieces[i][j]=="black")){
-                callNavigate(x,y,pieces);
-            }
-        }
-    }
+//Draw a piece
+function drawPiece(col, row){
+	var x = (col - 0.5) * pieceSize;
+	var y = (row - 0.5) * pieceSize;
+	var pos = pieceSize / 2;
+	ctx.beginPath();
+	ctx.arc(x, y, pos * 0.75, Math.PI * 2, false);
+	ctx.fill();
+	ctx.closePath();
 }
 
-function inverse(flag){
-    if (flag==0)
-        return "black";
-    if (flag==1)
-        return "white";
-}
+//Events
 
-function equivalent(flag){
-    if (flag==0)
-        return "white";
-    if (flag==1)
-        return "black";
-}
-
-function callNavigate(x,y,currentBoard){
-    navigate(x,y,"u",currentBoard);
-    navigate(x,y,"d",currentBoard);
-    navigate(x,y,"l",currentBoard);
-    navigate(x,y,"r",currentBoard);
-    navigate(x,y,"ur",currentBoard);
-    navigate(x,y,"ul",currentBoard);
-    navigate(x,y,"dr",currentBoard);
-    navigate(x,y,"dl",currentBoard);
-}
-function navigate(x,y,dir,currentBoard){
-    if (dir=="u"){
-        if (currentBoard(x,j)=="empty"){
-                currentBoard(x,j) = "white";
-        }
-    }
-    if (dir=="d"){
-
-    }
-    if (dir=="l"){
-
-    }
-    if (dir=="r"){
-
-    }
-    if (dir=="ur"){
-
-    }
-    if (dir=="ul"){
-
-    }
-    if (dir=="dr"){
-
-    }
-    if (dir=="dl"){
-
-    }
-}
-
-function initBoard(){
-    var pieces = new Array(dimension);
-    for (var k = 0; k < dimension; k++) {
-      pieces[k] = new Array(dimension);
-    }
-    for (var i=0; i<dimension; i++){
-        for (var j=0; j<dimension; j++){
-            pieces[i][j]="empty";
-        }
-    }
-    pieces[4][5] = "black";
-    pieces[5][4] = "black";
-    pieces[4][4] = "white";
-    pieces[5][5] = "white";
-    return pieces;
+function makeMovement(event){
+	var x = event.clientX - canvas.offsetLeft;
+	var y = event.clientY - canvas.offsetTop;
+	var col = Math.ceil(x / pieceSize);
+	var row = Math.ceil(y / pieceSize);
+	drawPiece(col, row);
 }
