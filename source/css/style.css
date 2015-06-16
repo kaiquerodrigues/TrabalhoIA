@@ -8,11 +8,11 @@
 }
 
 .board td {
-	border: 1px solid;
+	border: 2px solid;
 	width: 2em;
 	height: 2em;
 }
 
 .board .light {
-	background: #eee;
+	background: #006600;
 }
