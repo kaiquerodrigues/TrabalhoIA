@@ -16,3 +16,12 @@
 .board .light {
 	background: #006600;
 }
+
+.board .light:hover {
+	background: #000000;
+}
+
+#othello-canvas {
+	border: 2px solid;
+	background: #006600;
+}
