@@ -10,7 +10,6 @@ var pieceSize = length / n;
  var turn =0;
  var validPlays = [];
  var pieces = initBoard();
- calculateValidPlays();
 
 //Initialization
 
@@ -42,26 +41,31 @@ function drawPiece(row,col){
 }
 
 function play(x,y) {
+	calculateValidPlays();
 	if (turn==0){
 		ctx.fillStyle="#FFFFFF";
 	}
 	if (turn==1){
 		ctx.fillStyle="#000000";
 	}
+	 // Check if this play is valid before doing it
+	pieces[y][x] = equivalent(turn); // <-- gambiarra
 	turn = (turn +1) % 2;
 	drawPiece(x,y);
+	//
 }
 
 
 function calculateValidPlays(){
-	//esvaziar o vetor de validPlays
+	validPlays = [];
 	for (var i=0; i<n; i++){
 		for (var j=0; j<n; j++){
 			if ((turn==0 && pieces[i][j]=="white") || (turn==1 && pieces[i][j]=="black")){
-				callNavigate(i,j,pieces);
+				callNavigate(i,j);
 			}
 		}
 	}
+	calculateValidPlays();
 }
 
 function inverse(flag){
@@ -79,7 +83,7 @@ function equivalent(flag){
 }
 
 function callNavigate(x,y){
-	navigate(x,y,"u",true);
+	navigate(x,y,"u",false);
 	navigate(x,y,"d",false);
 	navigate(x,y,"l",false);
 	navigate(x,y,"r",false);
@@ -92,68 +96,108 @@ function callNavigate(x,y){
 function navigate(x,y,dir,flag){
 	var currentBoard = pieces;
 	if (dir=="u"){
-		if ((currentBoard[x][y]=="empty") && flag)
-			addValidPlay(x,y,currentBoard);
+		if (currentBoard[x][y]=="empty"){
+			if (flag)
+				addValidPlay(x,y,currentBoard);
+		}
 		else
-			if (y!=0)
+			if (y!=0){
 				if (currentBoard[x][y-1] == inverse(turn))
 					navigate(x,y-1,dir,true);
+				else
+					navigate(x,y-1,dir,flag);
+			}
 	}
 	if (dir=="d"){
-		if ((currentBoard[x][y]=="empty") && flag)
-			addValidPlay(x,y,currentBoard);
+		if (currentBoard[x][y]=="empty"){
+			if (flag)
+				addValidPlay(x,y,currentBoard);
+		}
 		else
-			if (y!=8)
+			if (y!=n-1){
 				if (currentBoard[x][y+1]==inverse(turn))
 					navigate(x,y+1,dir,true);
+				else
+					navigate(x,y+1,dir,flag);
+			}
 	}
 	if (dir=="l"){
-		if ((currentBoard[x][y]=="empty") && flag)
-			addValidPlay(x,y,currentBoard);
+		if (currentBoard[x][y]=="empty"){
+			if (flag)
+				addValidPlay(x,y,currentBoard);
+		}
 		else
-			if (x!=0)
+			if (x!=0){
 				if (currentBoard[x-1][y]==inverse(turn))
 					navigate(x-1,y,dir,true);
+				else
+					navigate(x-1,y,dir,flag);
+			}
 	}
 	if (dir=="r"){
-		if ((currentBoard[x][y]=="empty") && flag)
-			addValidPlay(x,y,currentBoard);
+		if (currentBoard[x][y]=="empty"){
+			if (flag)
+				addValidPlay(x,y,currentBoard);
+		}
 		else
-			if (x!=8)
+			if (x!=n-1){
 				if (currentBoard[x+1][y]==inverse(turn))
 					navigate(x+1,y,dir,true);
+				else
+					navigate(x+1,y,dir,flag);
+			}
 	}
 	if (dir=="ur"){
-		if ((currentBoard[x][y]=="empty") && flag)
-			addValidPlay(x,y,currentBoard);
+		if (currentBoard[x][y]=="empty"){
+			if (flag)
+				addValidPlay(x,y,currentBoard);
+		}
 		else
-			if ((x!=8) && (y!=0))
+			if ((x!=n-1) && (y!=0)){
 				if (currentBoard[x+1][y-1]==inverse(turn))
 					navigate(x+1,y-1,dir,true);
+				else
+					navigate(x+1,y-1,dir,flag);
+			}
 	}
 	if (dir=="ul"){
-		if ((currentBoard[x][y]=="empty") && flag)
-			addValidPlay(x,y,currentBoard);
+		if (currentBoard[x][y]=="empty"){
+			if (flag)
+				addValidPlay(x,y,currentBoard);
+		}
 		else
-			if ((x!=0) && (y!=0))
+			if ((x!=0) && (y!=0)){
 				if (currentBoard[x-1][y-1]==inverse(turn))
-					navigate(x-1,y-1,dir.true);
+					navigate(x-1,y-1,dir,true);
+				else
+					navigate(x-1,y-1,dir,flag);
+			}
 	}
 	if (dir=="dr"){
-		if ((currentBoard[x][y]=="empty") && flag)
-			addValidPlay(x,y,currentBoard);
+		if (currentBoard[x][y]=="empty"){
+			if (flag)
+				addValidPlay(x,y,currentBoard);
+		}
 		else
-			if ((x!=8) && (y!=8))
+			if ((x!=n-1) && (y!=n-1)){
 				if (currentBoard[x+1][y+1]==inverse(turn))
 					navigate(x+1,y+1,dir,true);
+				else
+					navigate(x+1,y+1,dir,flag);
+			}
 	}
 	if (dir=="dl"){
-		if ((currentBoard[x][y]=="empty") && flag)
-			addValidPlay(x,y,currentBoard);
+		if (currentBoard[x][y]=="empty"){
+			if (flag)
+				addValidPlay(x,y,currentBoard);
+		}
 		else
-			if ((x!=0) && (y!=8))
+			if ((x!=0) && (y!=n-1)){
 				if (currentBoard[x-1][y+1]==inverse(turn))
 					navigate(x-1,y+1,dir,true);
+				else
+					navigate(x-1,y+1,dir,flag);
+			}
 	}
 }
 
@@ -191,7 +235,9 @@ function initBoard(){
 function makeMovement(event){
 	var x = event.clientX - canvas.offsetLeft;
 	var y = event.clientY - canvas.offsetTop;
-	var col = Math.ceil(y / pieceSize)-1 ;
-	var row = Math.ceil(x / pieceSize)-1 ;
+	var col = Math.floor(y / pieceSize) ;
+	var row = Math.floor(x / pieceSize) ;
 	play(row,col);
 }
+
+ calculateValidPlays();
