@@ -10,6 +10,7 @@ var pieceSize = length / n;
  var turn =0;
  var validPlays = [];
  var pieces = initBoard();
+ calculateValidPlays();
 
 //Initialization
 
@@ -41,7 +42,6 @@ function drawPiece(row,col){
 }
 
 function play(x,y) {
-	//validPlays = calculateValidPlays();
 	if (turn==0){
 		ctx.fillStyle="#FFFFFF";
 	}
@@ -53,69 +53,114 @@ function play(x,y) {
 }
 
 
-// function calculateValidPlays(){
-// 	//esvaziar o vetor de validplays
-// 	for (var i=0; i<dimension; i++){
-// 		for (var j=0; j<dimension; j++){
-// 			if ((turn==0 && pieces[i][j]=="white") || (turn==1 && pieces[i][j]=="black")){
-// 				callNavigate(x,y,pieces);
-// 			}
-// 		}
-// 	}
-// }
+function calculateValidPlays(){
+	//esvaziar o vetor de validPlays
+	for (var i=0; i<n; i++){
+		for (var j=0; j<n; j++){
+			if ((turn==0 && pieces[i][j]=="white") || (turn==1 && pieces[i][j]=="black")){
+				callNavigate(i,j,pieces);
+			}
+		}
+	}
+}
 
-// function inverse(flag){
-// 	if (flag==0)
-// 		return "black";
-// 	if (flag==1)
-// 		return "white";
-// }
+function inverse(flag){
+	if (flag==0)
+		return "black";
+	if (flag==1)
+		return "white";
+}
 
-// function equivalent(flag){
-// 	if (flag==0)
-// 		return "white";
-// 	if (flag==1)
-// 		return "black";
-// }
+function equivalent(flag){
+	if (flag==0)
+		return "white";
+	if (flag==1)
+		return "black";
+}
 
-// function callNavigate(x,y,currentBoard){
-// 	navigate(x,y,"u",currentBoard);
-// 	navigate(x,y,"d",currentBoard);
-// 	navigate(x,y,"l",currentBoard);
-// 	navigate(x,y,"r",currentBoard);
-// 	navigate(x,y,"ur",currentBoard);
-// 	navigate(x,y,"ul",currentBoard);
-// 	navigate(x,y,"dr",currentBoard);
-// 	navigate(x,y,"dl",currentBoard);
-// }
-// function navigate(x,y,dir,currentBoard){
-// 	if (dir=="u"){
-// 		if (currentBoard(x,j)=="empty"){
-// 				currentBoard(x,j) = "white";
-// 		}
-// 	}
-// 	if (dir=="d"){
+function callNavigate(x,y){
+	navigate(x,y,"u",true);
+	navigate(x,y,"d",false);
+	navigate(x,y,"l",false);
+	navigate(x,y,"r",false);
+	navigate(x,y,"ur",false);
+	navigate(x,y,"ul",false);
+	navigate(x,y,"dr",false);
+	navigate(x,y,"dl",false);
+}
 
-// 	}
-// 	if (dir=="l"){
+function navigate(x,y,dir,flag){
+	var currentBoard = pieces;
+	if (dir=="u"){
+		if ((currentBoard[x][y]=="empty") && flag)
+			addValidPlay(x,y,currentBoard);
+		else
+			if (y!=0)
+				if (currentBoard[x][y-1] == inverse(turn))
+					navigate(x,y-1,dir,true);
+	}
+	if (dir=="d"){
+		if ((currentBoard[x][y]=="empty") && flag)
+			addValidPlay(x,y,currentBoard);
+		else
+			if (y!=8)
+				if (currentBoard[x][y+1]==inverse(turn))
+					navigate(x,y+1,dir,true);
+	}
+	if (dir=="l"){
+		if ((currentBoard[x][y]=="empty") && flag)
+			addValidPlay(x,y,currentBoard);
+		else
+			if (x!=0)
+				if (currentBoard[x-1][y]==inverse(turn))
+					navigate(x-1,y,dir,true);
+	}
+	if (dir=="r"){
+		if ((currentBoard[x][y]=="empty") && flag)
+			addValidPlay(x,y,currentBoard);
+		else
+			if (x!=8)
+				if (currentBoard[x+1][y]==inverse(turn))
+					navigate(x+1,y,dir,true);
+	}
+	if (dir=="ur"){
+		if ((currentBoard[x][y]=="empty") && flag)
+			addValidPlay(x,y,currentBoard);
+		else
+			if ((x!=8) && (y!=0))
+				if (currentBoard[x+1][y-1]==inverse(turn))
+					navigate(x+1,y-1,dir,true);
+	}
+	if (dir=="ul"){
+		if ((currentBoard[x][y]=="empty") && flag)
+			addValidPlay(x,y,currentBoard);
+		else
+			if ((x!=0) && (y!=0))
+				if (currentBoard[x-1][y-1]==inverse(turn))
+					navigate(x-1,y-1,dir.true);
+	}
+	if (dir=="dr"){
+		if ((currentBoard[x][y]=="empty") && flag)
+			addValidPlay(x,y,currentBoard);
+		else
+			if ((x!=8) && (y!=8))
+				if (currentBoard[x+1][y+1]==inverse(turn))
+					navigate(x+1,y+1,dir,true);
+	}
+	if (dir=="dl"){
+		if ((currentBoard[x][y]=="empty") && flag)
+			addValidPlay(x,y,currentBoard);
+		else
+			if ((x!=0) && (y!=8))
+				if (currentBoard[x-1][y+1]==inverse(turn))
+					navigate(x-1,y+1,dir,true);
+	}
+}
 
-// 	}
-// 	if (dir=="r"){
-
-// 	}
-// 	if (dir=="ur"){
-
-// 	}
-// 	if (dir=="ul"){
-
-// 	}
-// 	if (dir=="dr"){
-
-// 	}
-// 	if (dir=="dl"){
-
-// 	}
-// }
+function addValidPlay(x,y,currentBoard){
+	currentBoard[x][y] = equivalent(turn);
+	validPlays.push(currentBoard);
+}
 
 function initBoard(){
 	var pieces = new Array(n);
