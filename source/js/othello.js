@@ -168,9 +168,9 @@ function navigateChoice(x,y,dir,flag){
 }
 
 function addValidPlay(x,y){
-	pieces[x][y] = equivalent(turn);
-	validPlays.push(pieces);
-	pieces[x][y] = "empty";
+	var currentBoard = jQuery.extend(true,{}, pieces);
+	currentBoard[x][y] = equivalent(turn);
+	validPlays.push(currentBoard);
 }
 
 function initBoard(){
