@@ -10,21 +10,27 @@ var pieceSize = length / n;
 var turn =0;
 var validPlays = [];
 var pieces = initBoard();
+drawBoard();
 calculateValidPlays();
 
 //Initialization
 
 //Draw the board
-for (var i = 0; i < n - 1; i++) {
-	var pos = pieceSize * (i + 1);
-	ctx.beginPath();
-	ctx.moveTo(pos, 0);
-	ctx.lineTo(pos, length);
-	ctx.moveTo(0, pos);
-	ctx.lineTo(length, pos);
-	ctx.stroke();
-	ctx.closePath();
-};
+function drawBoard(){
+	for (var i = 0; i < n - 1; i++) {
+		var pos = pieceSize * (i + 1);
+		ctx.beginPath();
+		ctx.moveTo(pos, 0);
+		ctx.lineTo(pos, length);
+		ctx.moveTo(0, pos);
+		ctx.lineTo(length, pos);
+		ctx.stroke();
+		ctx.closePath();
+	}
+}
+
+
+
 //Add listeners
 canvas.addEventListener("mouseup", makeMovement, false);
 
@@ -83,85 +89,88 @@ function equivalent(flag){
 
 function callNavigate(x,y){
 	navigate(x,y,"u",false);
-	// navigate(x,y,"d",false);
-	// navigate(x,y,"l",false);
-	// navigate(x,y,"r",false);
-	// navigate(x,y,"ur",false);
-	// navigate(x,y,"ul",false);
-	// navigate(x,y,"dr",false);
-	// navigate(x,y,"dl",false);
+	navigate(x,y,"d",false);
+	navigate(x,y,"l",false);
+	navigate(x,y,"r",false);
+	navigate(x,y,"ur",false);
+	navigate(x,y,"ul",false);
+	navigate(x,y,"dr",false);
+	navigate(x,y,"dl",false);
 }
 
 function navigate(x,y,dir,flag){
-	if (dir=="u"){
-		if (y!=0){
-			y=y-1;
-			navigateChoice(x,y,dir,flag);
-		}
-	}
-	if (dir=="d"){
-		if (y!=n-1){
-			y=y+1;
-			navigateChoice(x,y,dir,flag);
-		}
-	}
-	if (dir=="l"){
-		if (x!=0){
-			x= x-1;
-			navigateChoice(x,y,dir,flag);
-		}
-	}
-	if (dir=="r"){
+	switch (dir){
+		case "u" :
+			if (y!=0){
+				y=y-1;
+				navigateChoice(x,y,dir,flag);
+			}
+			break;
+		case "d":
+			if (y!=n-1){
+				y=y+1;
+				navigateChoice(x,y,dir,flag);
+			}
+			break;
+		case "l":
+			if (x!=0){
+				x= x-1;
+				navigateChoice(x,y,dir,flag);
+			}
+			break;
+	case "r":
 		if (x!=n-1){
 			x=x+1;
 			navigateChoice(x,y,dir,flag);
 		}
-	}
-	if (dir=="ur"){
+		break;
+	case "ur":
 		if ((x!=n-1) && (y!=0)){
 			x=x+1;
 			y=y-1;
 			navigateChoice(x,y,dir,flag);
 		}
-	}
-	if (dir=="ul"){
+		break;
+	case "ul":
 		if ((x!=0) && (y!=0)){
 			x=x-1;
 			y=y-1;
 			navigateChoice(x,y,dir,flag);
 		}
-	}
-	if (dir=="dr"){
+		break;
+	case "dr":
 		if ((x!=n-1) && (y!=n-1)){
 			x=x+1;
 			y=y+1;
 			navigateChoice(x,y,dir,flag);
 		}
-	}
-	if (dir=="dl"){
+		break;
+	case "dl":
 		if ((x!=0) && (y!=n-1)){
 			x=x-1;
 			y=y+1;
 			navigateChoice(x,y,dir,flag);
 		}
+		break;
 	}
 }
 
 function navigateChoice(x,y,dir,flag){
 	if ((pieces[x][y]=="empty") && flag){
-		addValidPlay(x,y,pieces);
+		addValidPlay(x,y);
 	}
-	if (pieces[x][y] == inverse(turn)){
+	else if (pieces[x][y] == inverse(turn)){
 		navigate(x,y,dir,true);
 	}
-	if (pieces[x][y] == equivalent(turn)){
+	else if (pieces[x][y] == equivalent(turn)){
 		navigate(x,y,dir,flag);
 	} else{}
 }
 
-function addValidPlay(x,y,currentBoard){
-	currentBoard[x][y] = equivalent(turn);
-	validPlays.push(currentBoard);
+function addValidPlay(x,y){
+	pieces[x][y] = equivalent(turn);
+	validPlays.push(pieces);
+	pieces[x][y] = "empty";
 }
 
 function initBoard(){
