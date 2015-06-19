@@ -29,8 +29,6 @@ function drawBoard(){
 	}
 }
 
-
-
 //Add listeners
 canvas.addEventListener("mouseup", makeMovement, false);
 
@@ -47,26 +45,34 @@ function drawPiece(row,col){
 	ctx.closePath();
 }
 
-function play(x,y) {
-	calculateValidPlays();
+function setPieceColor(){
 	if (turn==0){
 		ctx.fillStyle="#FFFFFF";
 	}
 	if (turn==1){
 		ctx.fillStyle="#000000";
 	}
-	 // Check if this play is valid before doing it
-	pieces[y][x] = equivalent(turn); // <-- gambiarra
-	turn = (turn +1) % 2;
-	drawPiece(x,y);
-	//
+}
+
+function play(x,y) {
+	var newPlay = jQuery.extend(true,{}, pieces);
+	newPlay[x][y] = equivalent(turn);
+	setPieceColor();
+	// Check if this play is valid
+	if (canPlay(newPlay)){
+		pieces[y][x] = equivalent(turn);
+		turn = (turn +1) % 2;
+		calculateValidPlays();
+		drawPiece(x,y);
+	}
 }
 
 
 function calculateValidPlays(){
+	validPlays = [];
 	for (var i=0; i<n; i++){
 		for (var j=0; j<n; j++){
-			if ((turn==0 && pieces[i][j]=="white") || (turn==1 && pieces[i][j]=="black")){
+			if ((turn==0 && pieces[i][j]=="w") || (turn==1 && pieces[i][j]=="b")){
 				callNavigate(i,j);
 			}
 		}
@@ -75,16 +81,16 @@ function calculateValidPlays(){
 
 function inverse(flag){
 	if (flag==0)
-		return "black";
+		return "b";
 	if (flag==1)
-		return "white";
+		return "w";
 }
 
 function equivalent(flag){
 	if (flag==0)
-		return "white";
+		return "w";
 	if (flag==1)
-		return "black";
+		return "b";
 }
 
 function callNavigate(x,y){
@@ -156,7 +162,7 @@ function navigate(x,y,dir,flag){
 }
 
 function navigateChoice(x,y,dir,flag){
-	if ((pieces[x][y]=="empty") && flag){
+	if ((pieces[x][y]=="e") && flag){
 		addValidPlay(x,y);
 	}
 	else if (pieces[x][y] == inverse(turn)){
@@ -168,7 +174,7 @@ function navigateChoice(x,y,dir,flag){
 }
 
 function addValidPlay(x,y){
-	var currentBoard = jQuery.extend(true,{}, pieces);
+	 var currentBoard = jQuery.extend(true,{}, pieces);
 	currentBoard[x][y] = equivalent(turn);
 	validPlays.push(currentBoard);
 }
@@ -180,7 +186,7 @@ function initBoard(){
 	}
 	for (var i=0; i<n; i++){
 		for (var j=0; j<n; j++){
-			pieces[i][j]="empty";
+			pieces[i][j]="e";
 		}
 	}
 	//Draw the initial pieces
@@ -190,10 +196,10 @@ function initBoard(){
 	drawPiece(3,3);
 	drawPiece(4,4);
 	//Set the initial pieces on the pieces array
-	pieces[3][4] = "black";
-	pieces[4][3] = "black";
-	pieces[3][3] = "white";
-	pieces[4][4] = "white";
+	pieces[3][4] = "b";
+	pieces[4][3] = "b";
+	pieces[3][3] = "w";
+	pieces[4][4] = "w";
 	return pieces;
 }
 
@@ -205,4 +211,45 @@ function makeMovement(event){
 	var col = Math.floor(y / pieceSize) ;
 	var row = Math.floor(x / pieceSize) ;
 	play(row,col);
+}
+
+function canPlay (play){
+	for (var i=0; i< validPlays.length; i++){
+		if (arrayComp(play,validPlays[i])){
+			return true;
+		}
+	}
+	return false;
+}
+
+function arrayComp(array1,array2){
+	for (var i=0; i<n; i++){
+		if (array1[i].toString()!=array2[i].toString())
+			return false;
+	}
+	return true;
+}
+
+Array.prototype.equals = function (array) {
+	// if the other array is a falsy value, return
+	if (!array)
+			return false;
+
+	// compare lengths - can save a lot of time 
+	if (this.length != array.length)
+			return false;
+
+	for (var i = 0, l=this.length; i < l; i++) {
+			// Check if we have nested arrays
+			if (this[i] instanceof Array && array[i] instanceof Array) {
+					// recurse into the nested arrays
+					if (!this[i].equals(array[i]))
+							return false;       
+			}           
+			else if (this[i] != array[i]) { 
+					// Warning - two different object instances will never be equal: {x:20} != {x:20}
+					return false;   
+			}           
+	}       
+	return true;
 }
