@@ -1,5 +1,10 @@
-//Global Variables
+//tags HTML
+MESSAGE = "message";
+CURRENT_PLAYER = "current-player";
+WHITE_SCORE = "white-score";
+BLACK_SCORE = "black-score";
 
+//Global Variables
 var canvas = document.getElementById("othello-canvas"); 
 var ctx = canvas.getContext("2d"); 
 //Its not necessary to get height because the canvas is n x n.
@@ -56,9 +61,9 @@ function initBoard(){
 	scoreBoard = [2,2];
 
 	//Init html informations
-	updateMenu("current-player", currentPlayer(turn))
-	updateMenu("white-score",scoreBoard[0]);
-	updateMenu("black-score",scoreBoard[1]);
+	updateMenu(CURRENT_PLAYER, currentPlayer(turn))
+	updateMenu(WHITE_SCORE,scoreBoard[0]);
+	updateMenu(BLACK_SCORE,scoreBoard[1]);
 
 	return pieces;
 }
@@ -129,19 +134,27 @@ function makeMovement(event){
 	play(row,col);
 	endGame = (validPlays.length==0);
 	if (endGame){
-		alert("player " + currentPlayer(turn) + " lost turn!");
+		updateMenu(MESSAGE, "Player "+currentPlayer(turn)+" lost turn");
 		turn = (turn + 1) % 2;
 		calculateValidPlays();
 		if (validPlays.length == 0){
-			alert("player " + currentPlayer(turn) + " lost turn!");
-			alert("Game Over!");	
+			updateMenu(MESSAGE, gameOver());
 		}
 		else
 			endGame = false;		
 	}
-	updateMenu("current-player", currentPlayer(turn))
-	updateMenu("white-score",scoreBoard[0]);
-	updateMenu("black-score",scoreBoard[1]);
+	updateMenu(CURRENT_PLAYER, currentPlayer(turn))
+	updateMenu(WHITE_SCORE,scoreBoard[0]);
+	updateMenu(BLACK_SCORE,scoreBoard[1]);
+}
+
+function gameOver(){
+	if (scoreBoard[0] > scoreBoard[1])
+		return "The White player wins!";
+	else if (scoreBoard[0] > scoreBoard[1])
+		return "The Black player wins!";
+	else 
+		return "The game ends with a draw!";
 }
 
 //Makes a play
