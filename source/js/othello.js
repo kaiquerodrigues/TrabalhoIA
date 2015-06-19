@@ -159,7 +159,6 @@ function callNavigate(x,y){
 	navigate(x,y,"ul",false);
 	navigate(x,y,"dr",false);
 	navigate(x,y,"dl",false);
-
 }
 
 function navigate(x,y,dir,flag){
@@ -243,7 +242,7 @@ function addValidPlay(x,y,dir){
 
 //Update currentBoard to valid Play
 function updateColors(currentBoard,x,y,dir){
-	if ((currentPlay[0] != x) && (currentPlay[1] != y)){
+	if ((currentPlay[0] != x) || (currentPlay[1] != y)){
 		currentBoard[x][y] = equivalent(turn);
 		switch (dir){
 			case "u" :
