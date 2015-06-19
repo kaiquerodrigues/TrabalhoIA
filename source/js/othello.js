@@ -10,10 +10,10 @@ var pieceSize = length / n;
 var turn =0;
 var validPlays = [];
 var pieces = initBoard();
+var currentPlay;
+
 drawBoard();
 calculateValidPlays();
-
-//Initialization
 
 //Draw the board
 function drawBoard(){
@@ -29,156 +29,7 @@ function drawBoard(){
 	}
 }
 
-//Add listeners
-canvas.addEventListener("mouseup", makeMovement, false);
-
-//Functions
-
-//Draw a piece
-function drawPiece(row,col){
-	var x = (row + 0.5) * pieceSize;
-	var y = (col + 0.5) * pieceSize;
-	var pos = pieceSize / 2;
-	ctx.beginPath();
-	ctx.arc(x, y, pos * 0.75, Math.PI * 2, false);
-	ctx.fill();
-	ctx.closePath();
-}
-
-function setPieceColor(){
-	if (turn==0){
-		ctx.fillStyle="#FFFFFF";
-	}
-	if (turn==1){
-		ctx.fillStyle="#000000";
-	}
-}
-
-function play(x,y) {
-	var newPlay = jQuery.extend(true,{}, pieces);
-	newPlay[x][y] = equivalent(turn);
-	setPieceColor();
-	// Check if this play is valid
-	if (canPlay(newPlay)){
-		pieces[y][x] = equivalent(turn);
-		turn = (turn +1) % 2;
-		calculateValidPlays();
-		drawPiece(x,y);
-	}
-}
-
-
-function calculateValidPlays(){
-	validPlays = [];
-	for (var i=0; i<n; i++){
-		for (var j=0; j<n; j++){
-			if ((turn==0 && pieces[i][j]=="w") || (turn==1 && pieces[i][j]=="b")){
-				callNavigate(i,j);
-			}
-		}
-	}
-}
-
-function inverse(flag){
-	if (flag==0)
-		return "b";
-	if (flag==1)
-		return "w";
-}
-
-function equivalent(flag){
-	if (flag==0)
-		return "w";
-	if (flag==1)
-		return "b";
-}
-
-function callNavigate(x,y){
-	navigate(x,y,"u",false);
-	navigate(x,y,"d",false);
-	navigate(x,y,"l",false);
-	navigate(x,y,"r",false);
-	navigate(x,y,"ur",false);
-	navigate(x,y,"ul",false);
-	navigate(x,y,"dr",false);
-	navigate(x,y,"dl",false);
-}
-
-function navigate(x,y,dir,flag){
-	switch (dir){
-		case "u" :
-			if (y!=0){
-				y=y-1;
-				navigateChoice(x,y,dir,flag);
-			}
-			break;
-		case "d":
-			if (y!=n-1){
-				y=y+1;
-				navigateChoice(x,y,dir,flag);
-			}
-			break;
-		case "l":
-			if (x!=0){
-				x= x-1;
-				navigateChoice(x,y,dir,flag);
-			}
-			break;
-	case "r":
-		if (x!=n-1){
-			x=x+1;
-			navigateChoice(x,y,dir,flag);
-		}
-		break;
-	case "ur":
-		if ((x!=n-1) && (y!=0)){
-			x=x+1;
-			y=y-1;
-			navigateChoice(x,y,dir,flag);
-		}
-		break;
-	case "ul":
-		if ((x!=0) && (y!=0)){
-			x=x-1;
-			y=y-1;
-			navigateChoice(x,y,dir,flag);
-		}
-		break;
-	case "dr":
-		if ((x!=n-1) && (y!=n-1)){
-			x=x+1;
-			y=y+1;
-			navigateChoice(x,y,dir,flag);
-		}
-		break;
-	case "dl":
-		if ((x!=0) && (y!=n-1)){
-			x=x-1;
-			y=y+1;
-			navigateChoice(x,y,dir,flag);
-		}
-		break;
-	}
-}
-
-function navigateChoice(x,y,dir,flag){
-	if ((pieces[x][y]=="e") && flag){
-		addValidPlay(x,y);
-	}
-	else if (pieces[x][y] == inverse(turn)){
-		navigate(x,y,dir,true);
-	}
-	else if (pieces[x][y] == equivalent(turn)){
-		navigate(x,y,dir,flag);
-	} else{}
-}
-
-function addValidPlay(x,y){
-	 var currentBoard = jQuery.extend(true,{}, pieces);
-	currentBoard[x][y] = equivalent(turn);
-	validPlays.push(currentBoard);
-}
-
+//Initialization
 function initBoard(){
 	var pieces = new Array(n);
 	for (var k = 0; k < n; k++) {
@@ -203,8 +54,53 @@ function initBoard(){
 	return pieces;
 }
 
-//Events
+//Draw a piece
+function drawPiece(row,col){
+	var x = (row + 0.5) * pieceSize;
+	var y = (col + 0.5) * pieceSize;
+	var pos = pieceSize / 2;
+	ctx.beginPath();
+	ctx.arc(x, y, pos * 0.75, Math.PI * 2, false);
+	ctx.fill();
+	ctx.closePath();
+}
 
+//Change Piece Color
+function setPieceColor(piece){
+	if (piece=="w"){
+		ctx.fillStyle="#FFFFFF";
+	}
+	if (piece=="b"){
+		ctx.fillStyle="#000000";
+	}
+}
+
+
+//Add listeners
+canvas.addEventListener("mouseup", makeMovement, false);
+
+//Functions
+
+//Check which player the current turn/flag represents
+//0 - white
+//1 - black
+function equivalent(flag){
+	if (flag==0)
+		return "w";
+	if (flag==1)
+		return "b";
+}
+
+//white turn returns black
+//black turn returns white
+function inverse(flag){
+	if (flag==0)
+		return "b";
+	if (flag==1)
+		return "w";
+}
+
+//Check mouse event and calls a play
 function makeMovement(event){
 	var x = event.clientX - canvas.offsetLeft;
 	var y = event.clientY - canvas.offsetTop;
@@ -213,43 +109,182 @@ function makeMovement(event){
 	play(row,col);
 }
 
-function canPlay (play){
-	for (var i=0; i< validPlays.length; i++){
-		if (arrayComp(play,validPlays[i])){
-			return true;
+//Makes a play
+function play(x,y) {
+	// Check if this play is valid
+	if (pieces[x][y] == "e"){
+		var board = canPlay(x,y);
+		if (board != -1){
+			pieces = jQuery.extend(true,{}, board);
+			turn = (turn +1) % 2;
+			calculateValidPlays();
+			//update gameboard		
+			drawPlay(board);
 		}
 	}
-	return false;
 }
 
-function arrayComp(array1,array2){
-	for (var i=0; i<n; i++){
-		if (array1[i].toString()!=array2[i].toString())
-			return false;
+//Draw board with new pieces
+function drawPlay(board){
+	for (var i = 0; i<n; i++) {
+		for (var j = 0; j<n; j++) {
+			if (board[i][j] != "e"){
+				setPieceColor(board[i][j]);
+				drawPiece(i,j);
+			}
+		}
 	}
-	return true;
 }
 
-Array.prototype.equals = function (array) {
-	// if the other array is a falsy value, return
-	if (!array)
-			return false;
+//Calculate Valid Plays
+function calculateValidPlays(){
+	validPlays = [];
+	for (var i=0; i<n; i++){
+		for (var j=0; j<n; j++){
+			if ((turn==0 && pieces[i][j]=="w") || (turn==1 && pieces[i][j]=="b")){
+				callNavigate(i,j);
+			}
+		}
+	}
+}
 
-	// compare lengths - can save a lot of time 
-	if (this.length != array.length)
-			return false;
+//Possible directions to move
+function callNavigate(x,y){
+	currentPlay = [x,y];
+	navigate(x,y,"u",false);
+	navigate(x,y,"d",false);
+	navigate(x,y,"l",false);
+	navigate(x,y,"r",false);
+	navigate(x,y,"ur",false);
+	navigate(x,y,"ul",false);
+	navigate(x,y,"dr",false);
+	navigate(x,y,"dl",false);
 
-	for (var i = 0, l=this.length; i < l; i++) {
-			// Check if we have nested arrays
-			if (this[i] instanceof Array && array[i] instanceof Array) {
-					// recurse into the nested arrays
-					if (!this[i].equals(array[i]))
-							return false;       
-			}           
-			else if (this[i] != array[i]) { 
-					// Warning - two different object instances will never be equal: {x:20} != {x:20}
-					return false;   
-			}           
-	}       
-	return true;
+}
+
+function navigate(x,y,dir,flag){
+	switch (dir){
+		case "u" :
+			if (y!=0){
+				y=y-1;
+				navigateChoice(x,y,dir,flag);
+			}
+			break;
+		case "d":
+			if (y!=n-1){
+				y=y+1;
+				navigateChoice(x,y,dir,flag);
+			}
+			break;
+		case "l":
+			if (x!=0){
+				x= x-1;
+				navigateChoice(x,y,dir,flag);
+			}
+			break;
+		case "r":
+			if (x!=n-1){
+				x=x+1;
+				navigateChoice(x,y,dir,flag);
+			}
+			break;
+		case "ur":
+			if ((x!=n-1) && (y!=0)){
+				x=x+1;
+				y=y-1;
+				navigateChoice(x,y,dir,flag);
+			}
+			break;
+		case "ul":
+			if ((x!=0) && (y!=0)){
+				x=x-1;
+				y=y-1;
+				navigateChoice(x,y,dir,flag);
+			}
+			break;
+		case "dr":
+			if ((x!=n-1) && (y!=n-1)){
+				x=x+1;
+				y=y+1;
+				navigateChoice(x,y,dir,flag);
+			}
+			break;
+		case "dl":
+			if ((x!=0) && (y!=n-1)){
+				x=x-1;
+				y=y+1;
+				navigateChoice(x,y,dir,flag);
+			}
+			break;
+	}
+}
+
+//Which direction represents the movement
+function navigateChoice(x,y,dir,flag){
+	if ((pieces[x][y]=="e") && flag){
+		addValidPlay(x,y,dir);
+	}
+	else if (pieces[x][y] == inverse(turn)){
+		navigate(x,y,dir,true);
+
+	}
+	else if (pieces[x][y] == equivalent(turn)){
+		navigate(x,y,dir,flag);
+	} else{}
+}
+
+//Add a valid play to array
+function addValidPlay(x,y,dir){
+	var currentBoard = jQuery.extend(true,{}, pieces);
+	currentBoard[x][y] = equivalent(turn);
+	updateColors(currentBoard,x,y,dir);
+	validPlays.push(currentBoard);
+}
+
+//Update currentBoard to valid Play
+function updateColors(currentBoard,x,y,dir){
+	if ((currentPlay[0] != x) && (currentPlay[1] != y)){
+		currentBoard[x][y] = equivalent(turn);
+		switch (dir){
+			case "u" :
+					y=y+1;
+					break;
+			case "d":
+					y=y-1;
+					break;
+			case "l":
+					x= x+1;
+					break;
+			case "r":
+					x=x-1;
+					break;
+			case "ur":
+					x=x-1;
+					y=y+1;
+					break;
+			case "ul":
+					x=x+1;
+					y=y+1;
+					break;
+			case "dr":
+					x=x-1;
+					y=y-1;
+					break;
+			case "dl":
+					x=x+1;
+					y=y-1;
+					break;
+		}
+		updateColors(currentBoard,x,y,dir);
+	}
+}
+
+//Check if a play is valid
+function canPlay (x,y){
+	for (var i=0; i< validPlays.length; i++){
+		if (validPlays[i][x][y] != "e"){
+			return validPlays[i];
+		}
+	}
+	return -1;
 }
