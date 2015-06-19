@@ -126,7 +126,21 @@ function makeMovement(event){
 	var y = event.clientY - canvas.offsetTop;
 	var col = Math.floor(y / pieceSize) ;
 	var row = Math.floor(x / pieceSize) ;
+	var currentTurn = turn;
 	play(row,col);
+	if (turn!=currentTurn){
+		var pos = evaluateIA1();
+		play(pos[0],pos[1]);
+	}
+}
+
+function updateGUI(){
+	updateMenu("current-player", currentPlayer(turn))
+	updateMenu("white-score",scoreBoard[0]);
+	updateMenu("black-score",scoreBoard[1]);
+}
+
+function checkGameOver(){
 	endGame = (validPlays.length==0);
 	if (endGame){
 		alert("player " + currentPlayer(turn) + " lost turn!");
@@ -139,9 +153,6 @@ function makeMovement(event){
 		else
 			endGame = false;		
 	}
-	updateMenu("current-player", currentPlayer(turn))
-	updateMenu("white-score",scoreBoard[0]);
-	updateMenu("black-score",scoreBoard[1]);
 }
 
 //Makes a play
@@ -158,6 +169,8 @@ function play(x,y) {
 			drawPlay(board);	
 		}
 	}
+	checkGameOver();
+	updateGUI();
 }
 
 //Draw board with new pieces
@@ -364,5 +377,11 @@ function evaluateIA1(){
 			max = value;
 		}
 	}
-	return index;
+	for (i=0; i<n; i++){
+		for (j=0; j<n; j++){
+			if (validPlays[index][i][j]==equivalent(turn) && (pieces[i][j]=="e"))
+				return [i,j];
+		}
+	}
+	return -1;
 }
