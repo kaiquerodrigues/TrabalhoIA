@@ -7,7 +7,7 @@ var length = canvas.width;
 //Defines the board division: 4x4, 8x8...
 var n = 8;
 var pieceSize = length / n;
-var turn =0;
+var turn =1;
 var validPlays = [];
 var pieces = initBoard();
 var currentPlay;
@@ -221,25 +221,41 @@ function navigate(x,y,dir,flag){
 //Which direction represents the movement
 function navigateChoice(x,y,dir,flag){
 	if ((pieces[x][y]=="e") && flag){
-		addValidPlay(x,y,dir);
+		preparePlay(x,y,dir);
 	}
 	else if (pieces[x][y] == inverse(turn)){
 		navigate(x,y,dir,true);
 
 	}
-	else if (pieces[x][y] == equivalent(turn)){
-		navigate(x,y,dir,flag);
-	} else{}
+	//else if (pieces[x][y] == equivalent(turn)){
+	//	navigate(x,y,dir,flag);
+	//} else{}
 }
 
 //Add a valid play to array
-function addValidPlay(x,y,dir){
+function preparePlay(x,y,dir){
 	var currentBoard = jQuery.extend(true,{}, pieces);
 	currentBoard[x][y] = equivalent(turn);
 	updateColors(currentBoard,x,y,dir);
-	validPlays.push(currentBoard);
+	addValidPlay(currentBoard,x,y);
 }
 
+function addValidPlay(currentBoard,x,y){
+	for (var k=0; k< validPlays.length; k++){
+		if (validPlays[k][x][y] != "e"){
+			for (var i=0; i<n; i++){
+				for (var j=0; j<n; j++){
+					if (validPlays[k][i][j] != currentBoard[i][j]){
+						validPlays[k][i][j] = equivalent(turn);
+					}
+				}
+			}
+		return 1;
+		}
+	}
+	validPlays.push(currentBoard);
+	return 0;
+}
 //Update currentBoard to valid Play
 function updateColors(currentBoard,x,y,dir){
 	if ((currentPlay[0] != x) || (currentPlay[1] != y)){
@@ -276,7 +292,7 @@ function updateColors(currentBoard,x,y,dir){
 		}
 		updateColors(currentBoard,x,y,dir);
 	}
-}
+} 
 
 //Check if a play is valid
 function canPlay (x,y){
@@ -286,4 +302,4 @@ function canPlay (x,y){
 		}
 	}
 	return -1;
-}
+} 
