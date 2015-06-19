@@ -11,6 +11,7 @@ var turn =1;
 var validPlays = [];
 var pieces = initBoard();
 var currentPlay;
+var scoreBoard;
 
 drawBoard();
 calculateValidPlays();
@@ -51,6 +52,7 @@ function initBoard(){
 	pieces[4][3] = "b";
 	pieces[3][3] = "w";
 	pieces[4][4] = "w";
+	scoreBoard = [2,2];
 	return pieces;
 }
 
@@ -116,6 +118,7 @@ function play(x,y) {
 		var board = canPlay(x,y);
 		if (board != -1){
 			pieces = jQuery.extend(true,{}, board);
+			updateScoreBoard();
 			turn = (turn +1) % 2;
 			calculateValidPlays();
 			//update gameboard		
@@ -303,3 +306,19 @@ function canPlay (x,y){
 	}
 	return -1;
 } 
+
+function updateScoreBoard(){
+	scoreBoard = [0,0];
+	for (var i=0; i<n; i++){
+		for (var j=0; j<n; j++){
+			if (pieces[i][j]=="w")
+				scoreBoard[0] ++;
+			if (pieces[i][j]=="b")
+				scoreBoard[1] ++;	
+		}
+	}
+}
+
+function evaluate1(){
+
+}
