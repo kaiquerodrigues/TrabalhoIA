@@ -5,13 +5,14 @@ var ctx = canvas.getContext("2d");
 //Its not necessary to get height because the canvas is n x n.
 var length = canvas.width;
 //Defines the board division: 4x4, 8x8...
-var n = 8;
+var n =8;
 var pieceSize = length / n;
 var turn =1;
 var validPlays = [];
 var pieces = initBoard();
 var currentPlay;
 var scoreBoard;
+var endGame = false;
 
 drawBoard();
 calculateValidPlays();
@@ -53,6 +54,12 @@ function initBoard(){
 	pieces[3][3] = "w";
 	pieces[4][4] = "w";
 	scoreBoard = [2,2];
+
+	//Init html informations
+	updateMenu("current-player", currentPlayer(turn))
+	updateMenu("white-score",scoreBoard[0]);
+	updateMenu("black-score",scoreBoard[1]);
+
 	return pieces;
 }
 
@@ -102,6 +109,17 @@ function inverse(flag){
 		return "w";
 }
 
+function currentPlayer(flag){
+	if (flag==0)
+		return "White";
+	if (flag==1)
+		return "Black";
+}
+
+function updateMenu(id, text){
+	document.getElementById(id).innerHTML = text;
+}
+
 //Check mouse event and calls a play
 function makeMovement(event){
 	var x = event.clientX - canvas.offsetLeft;
@@ -109,6 +127,21 @@ function makeMovement(event){
 	var col = Math.floor(y / pieceSize) ;
 	var row = Math.floor(x / pieceSize) ;
 	play(row,col);
+	endGame = (validPlays.length==0);
+	if (endGame){
+		alert("player " + currentPlayer(turn) + " lost turn!");
+		turn = (turn + 1) % 2;
+		calculateValidPlays();
+		if (validPlays.length == 0){
+			alert("player " + currentPlayer(turn) + " lost turn!");
+			alert("Game Over!");	
+		}
+		else
+			endGame = false;		
+	}
+	updateMenu("current-player", currentPlayer(turn))
+	updateMenu("white-score",scoreBoard[0]);
+	updateMenu("black-score",scoreBoard[1]);
 }
 
 //Makes a play
@@ -118,11 +151,11 @@ function play(x,y) {
 		var board = canPlay(x,y);
 		if (board != -1){
 			pieces = jQuery.extend(true,{}, board);
-			updateScoreBoard();
+			scoreBoard = calculateScoreBoard(pieces);
 			turn = (turn +1) % 2;
 			calculateValidPlays();
 			//update gameboard		
-			drawPlay(board);
+			drawPlay(board);	
 		}
 	}
 }
@@ -307,18 +340,29 @@ function canPlay (x,y){
 	return -1;
 } 
 
-function updateScoreBoard(){
-	scoreBoard = [0,0];
+function calculateScoreBoard(board){
+	var score = [0,0];
 	for (var i=0; i<n; i++){
 		for (var j=0; j<n; j++){
-			if (pieces[i][j]=="w")
-				scoreBoard[0] ++;
-			if (pieces[i][j]=="b")
-				scoreBoard[1] ++;	
+			if (board[i][j]=="w")
+				score[0] ++;
+			if (board[i][j]=="b")
+				score[1] ++;	
 		}
 	}
+	return score;
 }
 
-function evaluate1(){
-
+//Calculate the number of pieces for each valid play
+function evaluateIA1(){
+	var max = 0;
+	var index = -1;
+	for (var i = 0; i < validPlays.length; i++) {
+		var value = calculateScoreBoard(validPlays[i])[turn];
+		if (max < value){
+			index = i;
+			max = value;
+		}
+	}
+	return index;
 }

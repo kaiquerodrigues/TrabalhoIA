@@ -4,10 +4,19 @@
         <title>Othello</title>
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="css/style.css">
+        <script src="js/jquery-1.11.3.js"></script>
     </head>
     <body>
-        <canvas id="othello-canvas" width="400" height="400"></canvas>
-        <script src="js/jquery-1.11.3.js"></script> 
+    	<div class="game-board">
+	        <canvas id="othello-canvas" width="400" height="400"></canvas>   
+        </div>
+        <div id="current-player-info">Next Player: <span id="current-player"></span></div>
+        <div id="score">Score: 
+            White: <span id="white-score"></span>
+            Black: <span id="black-score"></span>
+        </div>
         <script src="js/othello.js"></script> 
     </body>
 </html>
+
+        
