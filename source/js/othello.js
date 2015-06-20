@@ -21,6 +21,9 @@ var currentPlay;
 var scoreBoard;
 var endGame = false;
 
+MINMAX_DEPTH = 3;
+INIT_MINMAX_FLAG = 0;
+
 drawBoard();
 validPlays = calculateValidPlays(pieces);
 IAvsIA();
@@ -137,7 +140,7 @@ function makeMovement(event){
 		play(row,col);
 	}
 	if (turn==0){
-		var pos = minMax(2,1,pieces,validPlays);
+		var pos = minMax(MINMAX_DEPTH,INIT_MINMAX_FLAG,pieces,validPlays);
 		play(pos[0],pos[1]);
 	}
 }
@@ -450,10 +453,10 @@ function IAvsIA (){
 	var currentTurn = turn;
 	while(validPlays.length != 0){
 		if (turn!=currentTurn){
-			var pos = minMax(2,1,pieces,validPlays);
+			var pos = minMax(MINMAX_DEPTH,INIT_MINMAX_FLAG,pieces,validPlays);
 			play(pos[0],pos[1]);
 		}else{
-			var pos = minMax(3,1,pieces,validPlays);
+			var pos = minMax(MINMAX_DEPTH,INIT_MINMAX_FLAG,pieces,validPlays);
 			play(pos[0],pos[1]);
 		}
 		alert("");
