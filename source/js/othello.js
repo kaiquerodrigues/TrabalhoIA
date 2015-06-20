@@ -21,7 +21,7 @@ var endGame = false;
 
 drawBoard();
 calculateValidPlays();
-//IAvsIA();
+// IAvsIA();
 
 //Draw the board
 function drawBoard(){
@@ -133,7 +133,7 @@ function makeMovement(event){
 	var currentTurn = turn;
 	play(row,col);
 	if (turn!=currentTurn){
-		var pos = evaluateIA1();
+		var pos = evaluateIA2();
 		play(pos[0],pos[1]);
 	}
 }
@@ -380,6 +380,18 @@ function calculateScoreBoard(board){
 	return score;
 }
 
+function calculateDistanceFromEdges(play){
+	var value = 0;
+	for (var i=0; i<n; i++){
+		for (var j=0; j<n; j++){
+			if (play[i][j]==equivalent(turn)){
+				value += n-1 - (Math.min(i,n-1-i) + Math.min(j,n-1-j));
+			}
+		}
+	}
+	return value;
+}
+
 //Evaluate with the number of pieces of a valid play
 function evaluateIA1(){
 	var max = 0;
@@ -400,18 +412,34 @@ function evaluateIA1(){
 	return -1;
 }
 
-function evaluateIA2(){
 
+function evaluateIA2(){
+	var max = 0;
+	var index = -1;
+	for (var i=0; i<validPlays.length; i++){
+		var value = calculateDistanceFromEdges(validPlays[i]);
+		if (max < value){
+			index = i;
+			max = value;
+		}
+	}
+	for (i=0; i<n; i++){
+		for (j=0; j<n; j++){
+			if (validPlays[index][i][j]==equivalent(turn) && (pieces[i][j]=="e"))
+				return [i,j];
+		}
+	}
+	return -1;
 }
 
 function IAvsIA (){
 	var currentTurn = turn;
 	while(validPlays.length != 0){
 		if (turn!=currentTurn){
-			var pos = evaluateIA1();
+			var pos = evaluateIA2();
 			play(pos[0],pos[1]);
 		}else{
-			var pos = evaluateIA1();
+			var pos = evaluateIA2();
 			play(pos[0],pos[1]);
 		}
 		alert("proxima jogada");
