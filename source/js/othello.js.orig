@@ -157,6 +157,8 @@ function checkGameOver(){
 		else
 			endGame = false;		
 	}
+<<<<<<< HEAD
+=======
 	updateMenu(CURRENT_PLAYER, currentPlayer(turn))
 	updateMenu(WHITE_SCORE,scoreBoard[0]);
 	updateMenu(BLACK_SCORE,scoreBoard[1]);
@@ -169,6 +171,7 @@ function gameOver(){
 		return "The Black player wins!";
 	else 
 		return "The game ends with a draw!";
+>>>>>>> f7a62c201b1af068dc8ea0ac61f7be624a7d4c7e
 }
 
 //Makes a play
