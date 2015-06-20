@@ -396,51 +396,48 @@ function calculateDistanceFromEdges(play){
 
 //Evaluate with the number of pieces of a valid play
 function evaluateIA1(flagMinMax, plays){
-	var max = 0;
-	var min = n*n;
+	var minmax = [0,n*n];
 	var index = [-1,-1];
 	for (var i = 0; i < plays.length; i++) {
 		var value = calculateScoreBoard(plays[i])[turn];
-		if (max < value){
+		if (minmax[0] < value){
 			index[0] = i;
-			max = value;
+			minmax[0] = value;
 		}
-		if (min > value){
+		if (minmax[1] > value){
 			index[1] = i;
-			min = value;
+			minmax[1] = value;
 		}
 	}
 	var flag = index[flagMinMax];	
 	for (i=0; i<n; i++){
 		for (j=0; j<n; j++){
 			if (plays[flag][i][j]==equivalent(turn) && (pieces[i][j]=="e"))
-				return [i,j];
+				return [i,j,minmax[flagMinMax]];
 		}
 	}
 	return -1;
 }
 
-
 function evaluateIA2(flagMinMax, plays){
-	var max = 0;
-	var min = calculateMaxBoardValue();
+	var minmax = [0,calculateMaxBoardValue()];
 	var index = [-1,-1];
 	for (var i=0; i<plays.length; i++){
 		var value = calculateDistanceFromEdges(plays[i]);
-		if (max < value){
+		if (minmax[0] < value){
 			index[0] = i;
-			max = value;
+			minmax[0] = value;
 		}
-		if (min > value){
+		if (minmax[1] > value){
 			index[1] = i;
-			min = value;
+			minmax[1] = value;
 		}
 	}
 	var flag = index[flagMinMax];
 	for (i=0; i<n; i++){
 		for (j=0; j<n; j++){
 			if (plays[flag][i][j]==equivalent(turn) && (pieces[i][j]=="e"))
-				return [i,j];
+				return [i,j,minmax[flagMinMax]];
 		}
 	}
 	return -1;
@@ -470,14 +467,38 @@ function calculateMaxBoardValue(){
 	return value;
 }
 
-function minMax(depth, flagMinMax, possiblePlays){
-	if (depth>0){
-		for (var i=0; i<possiblePlays.length; i++){
-			board = possiblePlays[i];
-			var value = minMax(depth-1, (flagMinMax+1)%2, calculateValidPlays(board));
-		}
-	}
-	else{
-
-	}
-}
+// function minMax(depth, flagMinMax, possiblePlays){
+// 	if (depth>0){
+// 		var currentValue = evaluateIA2(flagMinMax,[possiblePlays[0]]);
+// 		var board;
+// 		var index;
+// 		for (var i=0; i<possiblePlays.length; i++){
+// 			board = jQuery.extend(true,{}, possiblePlays[i]);
+// 			newValue = minMax(depth-1, (flagMinMax+1)%2, calculateValidPlays(board));
+// 			if (flagMinMax==0){
+// 				if (currentValue[2]<newValue[2]){
+// 					currentValue[2] = newValue[2];
+// 					index =i;
+// 				}
+// 			}
+// 			if (flagMinMax==1){
+// 				if (currentValue[2]>newValue[2]){
+// 					currentValue[2] = newValue[2];
+// 					index=i;
+// 				}
+// 			}
+// 		}
+// 		for (i=0; i<n; i++){
+// 			for (j=0; j<n; j++){
+// 				if (possiblePlays[index][i][j]==equivalent(turn) && (pieces[i][j]=="e")){
+// 					result[0] = i;
+// 					result[1] = j;
+// 				}
+// 			}
+// 		}
+// 	}
+// 	else{
+// 		var result = evaluateIA2(flagMinMax,possiblePlays);
+// 	}
+// 	return result;
+// }
