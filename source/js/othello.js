@@ -12,7 +12,7 @@ var length = canvas.width;
 //Defines the board division: 4x4, 8x8...
 var n =8;
 var pieceSize = length / n;
-var turn =1;
+var turn = 0;
 var validPlays = [];
 var pieces = initBoard();
 var currentPlay;
@@ -21,7 +21,7 @@ var endGame = false;
 
 drawBoard();
 validPlays = calculateValidPlays(pieces);
-// IAvsIA();
+IAvsIA();
 
 //Draw the board
 function drawBoard(){
@@ -135,7 +135,7 @@ function makeMovement(event){
 		play(row,col);
 	}
 	if (turn==0){
-		var pos = evaluateIA2(0,validPlays);
+		var pos = minMax(2,1,validPlays);
 		play(pos[0],pos[1]);
 	}
 }
@@ -447,13 +447,12 @@ function IAvsIA (){
 	var currentTurn = turn;
 	while(validPlays.length != 0){
 		if (turn!=currentTurn){
-			var pos = evaluateIA2(0,validPlays);
+			var pos = minMax(0,1,validPlays);
 			play(pos[0],pos[1]);
 		}else{
-			var pos = evaluateIA2(0,validPlays);
+			var pos = minMax(3,1,validPlays);
 			play(pos[0],pos[1]);
 		}
-		alert("proxima jogada");
 	}
 }
 
@@ -467,38 +466,48 @@ function calculateMaxBoardValue(){
 	return value;
 }
 
-// function minMax(depth, flagMinMax, possiblePlays){
-// 	if (depth>0){
-// 		var currentValue = evaluateIA2(flagMinMax,[possiblePlays[0]]);
-// 		var board;
-// 		var index;
-// 		for (var i=0; i<possiblePlays.length; i++){
-// 			board = jQuery.extend(true,{}, possiblePlays[i]);
-// 			newValue = minMax(depth-1, (flagMinMax+1)%2, calculateValidPlays(board));
-// 			if (flagMinMax==0){
-// 				if (currentValue[2]<newValue[2]){
-// 					currentValue[2] = newValue[2];
-// 					index =i;
-// 				}
-// 			}
-// 			if (flagMinMax==1){
-// 				if (currentValue[2]>newValue[2]){
-// 					currentValue[2] = newValue[2];
-// 					index=i;
-// 				}
-// 			}
-// 		}
-// 		for (i=0; i<n; i++){
-// 			for (j=0; j<n; j++){
-// 				if (possiblePlays[index][i][j]==equivalent(turn) && (pieces[i][j]=="e")){
-// 					result[0] = i;
-// 					result[1] = j;
-// 				}
-// 			}
-// 		}
-// 	}
-// 	else{
-// 		var result = evaluateIA2(flagMinMax,possiblePlays);
-// 	}
-// 	return result;
-// }
+function minMax(depth, flagMinMax, possiblePlays){
+	if (depth>0){
+		var currentValue;
+		// DEFINIR OQ FAZER QUANDO NAO TIVER JOGADAS POSSIVEIS
+		if (possiblePlays.length==0){
+			currentValue = [-1,-1,0];
+		}
+		else{
+			currentValue = evaluateIA2(flagMinMax,[possiblePlays[0]]);
+		}
+		var index=0;
+		var board;
+		for (var i=0; i<possiblePlays.length; i++){
+			board = jQuery.extend(true,{}, possiblePlays[i]);
+			newValue = minMax(depth-1, (flagMinMax+1)%2, calculateValidPlays(board));
+			if (flagMinMax==0){
+				if (currentValue[2]<newValue[2]){
+					currentValue[2] = newValue[2];
+					index =i;
+				}
+			}
+			if (flagMinMax==1){
+				if (currentValue[2]>newValue[2]){
+					currentValue[2] = newValue[2];
+					index=i;
+				}
+			}
+		}
+		//DEFINIR OQ FAZER QUANDO NAO TIVER JGOADAS POSSIVEIS
+		if (possiblePlays.lenght!=0){
+			for (i=0; i<n; i++){
+				for (j=0; j<n; j++){
+					if (possiblePlays[index][i][j]==equivalent(turn) && (pieces[i][j]=="e")){
+						currentValue[0] = i;
+						currentValue[1] = j;
+					}
+				}
+			}
+		}
+	}
+	else{
+		var currentValue = evaluateIA2(flagMinMax,possiblePlays);
+	}
+	return currentValue;
+}
