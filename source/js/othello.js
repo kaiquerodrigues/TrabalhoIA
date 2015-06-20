@@ -14,7 +14,7 @@ var n =8;
 var pieceSize = length / n;
 // 0 - white starts
 // 1 - black starts
-var turn = 0;
+var turn = 1;
 var validPlays = [];
 var pieces = initBoard();
 var currentPlay;
@@ -26,7 +26,7 @@ INIT_MINMAX_FLAG = 0;
 
 drawBoard();
 validPlays = calculateValidPlays(pieces);
-IAvsIA();
+//IAvsIA();
 
 //Draw the board
 function drawBoard(){
