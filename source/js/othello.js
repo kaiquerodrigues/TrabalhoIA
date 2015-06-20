@@ -21,6 +21,7 @@ var endGame = false;
 
 drawBoard();
 calculateValidPlays();
+//IAvsIA();
 
 //Draw the board
 function drawBoard(){
@@ -61,9 +62,7 @@ function initBoard(){
 	scoreBoard = [2,2];
 
 	//Init html informations
-	updateMenu(CURRENT_PLAYER, currentPlayer(turn))
-	updateMenu(WHITE_SCORE,scoreBoard[0]);
-	updateMenu(BLACK_SCORE,scoreBoard[1]);
+	updateGUI();
 
 	return pieces;
 }
@@ -140,9 +139,9 @@ function makeMovement(event){
 }
 
 function updateGUI(){
-	updateMenu("current-player", currentPlayer(turn))
-	updateMenu("white-score",scoreBoard[0]);
-	updateMenu("black-score",scoreBoard[1]);
+	updateMenu(CURRENT_PLAYER, currentPlayer(turn))
+	updateMenu(WHITE_SCORE,scoreBoard[0]);
+	updateMenu(BLACK_SCORE,scoreBoard[1]);
 }
 
 function checkGameOver(){
@@ -157,15 +156,14 @@ function checkGameOver(){
 		else
 			endGame = false;		
 	}
-	updateMenu(CURRENT_PLAYER, currentPlayer(turn))
-	updateMenu(WHITE_SCORE,scoreBoard[0]);
-	updateMenu(BLACK_SCORE,scoreBoard[1]);
+	updateGUI();
 }
 
 function gameOver(){
+	updateMenu(CURRENT_PLAYER, "-");
 	if (scoreBoard[0] > scoreBoard[1])
 		return "The White player wins!";
-	else if (scoreBoard[0] > scoreBoard[1])
+	else if (scoreBoard[0] < scoreBoard[1])
 		return "The Black player wins!";
 	else 
 		return "The game ends with a draw!";
@@ -382,7 +380,7 @@ function calculateScoreBoard(board){
 	return score;
 }
 
-//Calculate the number of pieces for each valid play
+//Evaluate with the number of pieces of a valid play
 function evaluateIA1(){
 	var max = 0;
 	var index = -1;
@@ -400,4 +398,22 @@ function evaluateIA1(){
 		}
 	}
 	return -1;
+}
+
+function evaluateIA2(){
+
+}
+
+function IAvsIA (){
+	var currentTurn = turn;
+	while(validPlays.length != 0){
+		if (turn!=currentTurn){
+			var pos = evaluateIA1();
+			play(pos[0],pos[1]);
+		}else{
+			var pos = evaluateIA1();
+			play(pos[0],pos[1]);
+		}
+		alert("proxima jogada");
+	}
 }
