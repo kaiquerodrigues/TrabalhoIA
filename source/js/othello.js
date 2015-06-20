@@ -130,9 +130,11 @@ function makeMovement(event){
 	var y = event.clientY - canvas.offsetTop;
 	var col = Math.floor(y / pieceSize) ;
 	var row = Math.floor(x / pieceSize) ;
-	var currentTurn = turn;
-	play(row,col);
-	if (turn!=currentTurn){
+	// Check if it's turn of IA or Player;
+	if (turn==1){
+		play(row,col);
+	}
+	if (turn==0){
 		var pos = evaluateIA2(0,validPlays);
 		play(pos[0],pos[1]);
 	}
