@@ -156,8 +156,10 @@ function checkGameOver(){
 		if (validPlays.length == 0){
 			updateMenu(MESSAGE, gameOver());
 		}
-		else
+		else{
 			endGame = false;		
+			updateMenu(MESSAGE,"");
+		}
 	}
 	updateGUI();
 }
