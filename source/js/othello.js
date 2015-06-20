@@ -133,7 +133,7 @@ function makeMovement(event){
 	var currentTurn = turn;
 	play(row,col);
 	if (turn!=currentTurn){
-		var pos = evaluateIA2();
+		var pos = evaluateIA2(0,validPlays);
 		play(pos[0],pos[1]);
 	}
 }
@@ -393,19 +393,25 @@ function calculateDistanceFromEdges(play){
 }
 
 //Evaluate with the number of pieces of a valid play
-function evaluateIA1(){
+function evaluateIA1(flagMinMax, plays){
 	var max = 0;
-	var index = -1;
-	for (var i = 0; i < validPlays.length; i++) {
-		var value = calculateScoreBoard(validPlays[i])[turn];
+	var min = n*n;
+	var index = [-1,-1];
+	for (var i = 0; i < plays.length; i++) {
+		var value = calculateScoreBoard(plays[i])[turn];
 		if (max < value){
-			index = i;
+			index[0] = i;
 			max = value;
 		}
+		if (min > value){
+			index[1] = i;
+			min = value;
+		}
 	}
+	var flag = index[flagMinMax];	
 	for (i=0; i<n; i++){
 		for (j=0; j<n; j++){
-			if (validPlays[index][i][j]==equivalent(turn) && (pieces[i][j]=="e"))
+			if (plays[flag][i][j]==equivalent(turn) && (pieces[i][j]=="e"))
 				return [i,j];
 		}
 	}
@@ -413,19 +419,25 @@ function evaluateIA1(){
 }
 
 
-function evaluateIA2(){
+function evaluateIA2(flagMinMax, plays){
 	var max = 0;
-	var index = -1;
-	for (var i=0; i<validPlays.length; i++){
-		var value = calculateDistanceFromEdges(validPlays[i]);
+	var min = calculateMaxBoardValue();
+	var index = [-1,-1];
+	for (var i=0; i<plays.length; i++){
+		var value = calculateDistanceFromEdges(plays[i]);
 		if (max < value){
-			index = i;
+			index[0] = i;
 			max = value;
 		}
+		if (min > value){
+			index[1] = i;
+			min = value;
+		}
 	}
+	var flag = index[flagMinMax];
 	for (i=0; i<n; i++){
 		for (j=0; j<n; j++){
-			if (validPlays[index][i][j]==equivalent(turn) && (pieces[i][j]=="e"))
+			if (plays[flag][i][j]==equivalent(turn) && (pieces[i][j]=="e"))
 				return [i,j];
 		}
 	}
@@ -436,12 +448,34 @@ function IAvsIA (){
 	var currentTurn = turn;
 	while(validPlays.length != 0){
 		if (turn!=currentTurn){
-			var pos = evaluateIA2();
+			var pos = evaluateIA2(0,validPlays);
 			play(pos[0],pos[1]);
 		}else{
-			var pos = evaluateIA2();
+			var pos = evaluateIA2(0,validPlays);
 			play(pos[0],pos[1]);
 		}
 		alert("proxima jogada");
 	}
 }
+
+function calculateMaxBoardValue(){
+	var value =0;
+	for (var i=0; i<n; i++){
+		for (var j=0; j<n; j++){
+			value += n-1 - (Math.min(i,n-1-i) + Math.min(j,n-1-j));
+		}
+	}
+	return value;
+}
+
+// function minMax(depth, flagMinMax, possiblePlays){
+// 	if (depth>0){
+// 		for (var i=0; i<possiblePlays.length; i++){
+// 			board = possiblePlays[i];
+// 			var value = minMax(depth-1, (flagMinMax+1)%2, calculateValidPlays(board));
+// 		}
+// 	}
+// 	else{
+
+// 	}
+// }
