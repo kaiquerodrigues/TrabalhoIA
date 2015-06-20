@@ -20,7 +20,7 @@ var scoreBoard;
 var endGame = false;
 
 drawBoard();
-calculateValidPlays();
+validPlays = calculateValidPlays(pieces);
 // IAvsIA();
 
 //Draw the board
@@ -141,7 +141,7 @@ function makeMovement(event){
 }
 
 function updateGUI(){
-	updateMenu(CURRENT_PLAYER, currentPlayer(turn))
+	updateMenu(CURRENT_PLAYER, currentPlayer(turn));
 	updateMenu(WHITE_SCORE,scoreBoard[0]);
 	updateMenu(BLACK_SCORE,scoreBoard[1]);
 }
@@ -151,7 +151,8 @@ function checkGameOver(){
 	if (endGame){
 		updateMenu(MESSAGE, "Player "+currentPlayer(turn)+" lost turn");
 		turn = (turn + 1) % 2;
-		calculateValidPlays();
+		updateMenu(CURRENT_PLAYER,currentPlayer(turn));
+		validPlays = calculateValidPlays(pieces);
 		if (validPlays.length == 0){
 			updateMenu(MESSAGE, gameOver());
 		}
@@ -180,7 +181,7 @@ function play(x,y) {
 			pieces = jQuery.extend(true,{}, board);
 			scoreBoard = calculateScoreBoard(pieces);
 			turn = (turn +1) % 2;
-			calculateValidPlays();
+			validPlays = calculateValidPlays(pieces);
 			//update gameboard		
 			drawPlay(board);	
 		}
@@ -202,123 +203,120 @@ function drawPlay(board){
 }
 
 //Calculate Valid Plays
-function calculateValidPlays(){
-	validPlays = [];
+function calculateValidPlays(board){
+	var plays = [];
 	for (var i=0; i<n; i++){
 		for (var j=0; j<n; j++){
-			if ((turn==0 && pieces[i][j]=="w") || (turn==1 && pieces[i][j]=="b")){
-				callNavigate(i,j);
+			if ((turn==0 && board[i][j]=="w") || (turn==1 && board[i][j]=="b")){
+				callNavigate(i,j,board,plays);
 			}
 		}
 	}
+	return plays;
 }
 
 //Possible directions to move
-function callNavigate(x,y){
+function callNavigate(x,y,board,plays){
 	currentPlay = [x,y];
-	navigate(x,y,"u",false);
-	navigate(x,y,"d",false);
-	navigate(x,y,"l",false);
-	navigate(x,y,"r",false);
-	navigate(x,y,"ur",false);
-	navigate(x,y,"ul",false);
-	navigate(x,y,"dr",false);
-	navigate(x,y,"dl",false);
+	navigate(x,y,"u",false,board,plays);
+	navigate(x,y,"d",false,board,plays);
+	navigate(x,y,"l",false,board,plays);
+	navigate(x,y,"r",false,board,plays);
+	navigate(x,y,"ur",false,board,plays);
+	navigate(x,y,"ul",false,board,plays);
+	navigate(x,y,"dr",false,board,plays);
+	navigate(x,y,"dl",false,board,plays);
 }
 
-function navigate(x,y,dir,flag){
+function navigate(x,y,dir,flag,board,plays){
 	switch (dir){
 		case "u" :
 			if (y!=0){
 				y=y-1;
-				navigateChoice(x,y,dir,flag);
+				navigateChoice(x,y,dir,flag,board,plays);
 			}
 			break;
 		case "d":
 			if (y!=n-1){
 				y=y+1;
-				navigateChoice(x,y,dir,flag);
+				navigateChoice(x,y,dir,flag,board,plays);
 			}
 			break;
 		case "l":
 			if (x!=0){
 				x= x-1;
-				navigateChoice(x,y,dir,flag);
+				navigateChoice(x,y,dir,flag,board,plays);
 			}
 			break;
 		case "r":
 			if (x!=n-1){
 				x=x+1;
-				navigateChoice(x,y,dir,flag);
+				navigateChoice(x,y,dir,flag,board,plays);
 			}
 			break;
 		case "ur":
 			if ((x!=n-1) && (y!=0)){
 				x=x+1;
 				y=y-1;
-				navigateChoice(x,y,dir,flag);
+				navigateChoice(x,y,dir,flag,board,plays);
 			}
 			break;
 		case "ul":
 			if ((x!=0) && (y!=0)){
 				x=x-1;
 				y=y-1;
-				navigateChoice(x,y,dir,flag);
+				navigateChoice(x,y,dir,flag,board,plays);
 			}
 			break;
 		case "dr":
 			if ((x!=n-1) && (y!=n-1)){
 				x=x+1;
 				y=y+1;
-				navigateChoice(x,y,dir,flag);
+				navigateChoice(x,y,dir,flag,board,plays);
 			}
 			break;
 		case "dl":
 			if ((x!=0) && (y!=n-1)){
 				x=x-1;
 				y=y+1;
-				navigateChoice(x,y,dir,flag);
+				navigateChoice(x,y,dir,flag,board,plays);
 			}
 			break;
 	}
 }
 
 //Which direction represents the movement
-function navigateChoice(x,y,dir,flag){
-	if ((pieces[x][y]=="e") && flag){
-		preparePlay(x,y,dir);
+function navigateChoice(x,y,dir,flag,board,plays){
+	if ((board[x][y]=="e") && flag){
+		preparePlay(x,y,dir,plays);
 	}
-	else if (pieces[x][y] == inverse(turn)){
-		navigate(x,y,dir,true);
-
+	else if (board[x][y] == inverse(turn)){
+		navigate(x,y,dir,true,board,plays);
 	}
-	//else if (pieces[x][y] == equivalent(turn)){
-	//	navigate(x,y,dir,flag);
-	//} else{}
 }
 
 //Add a valid play to array
-function preparePlay(x,y,dir){
+function preparePlay(x,y,dir,plays){
 	var currentBoard = jQuery.extend(true,{}, pieces);
 	currentBoard[x][y] = equivalent(turn);
 	updateColors(currentBoard,x,y,dir);
-	addValidPlay(currentBoard,x,y);
+	addValidPlay(currentBoard,x,y,plays);
 }
 
-function addValidPlay(currentBoard,x,y){
-	for (var k=0; k< validPlays.length; k++){
-		if (validPlays[k][x][y] != "e"){
+function addValidPlay(currentBoard,x,y,plays){
+	for (var k=0; k< plays.length; k++){
+		if (plays[k][x][y] != "e"){
 			for (var i=0; i<n; i++){
 				for (var j=0; j<n; j++){
-					if (validPlays[k][i][j] != currentBoard[i][j]){
-						validPlays[k][i][j] = equivalent(turn);
+					if (plays[k][i][j] != currentBoard[i][j]){
+						plays[k][i][j] = equivalent(turn);
 					}
 				}
 			}
 		return 1;
 		}
 	}
-	validPlays.push(currentBoard);
+	plays.push(currentBoard);
 	return 0;
 }
 //Update currentBoard to valid Play
@@ -470,14 +468,14 @@ function calculateMaxBoardValue(){
 	return value;
 }
 
-// function minMax(depth, flagMinMax, possiblePlays){
-// 	if (depth>0){
-// 		for (var i=0; i<possiblePlays.length; i++){
-// 			board = possiblePlays[i];
-// 			var value = minMax(depth-1, (flagMinMax+1)%2, calculateValidPlays(board));
-// 		}
-// 	}
-// 	else{
+function minMax(depth, flagMinMax, possiblePlays){
+	if (depth>0){
+		for (var i=0; i<possiblePlays.length; i++){
+			board = possiblePlays[i];
+			var value = minMax(depth-1, (flagMinMax+1)%2, calculateValidPlays(board));
+		}
+	}
+	else{
 
-// 	}
-// }
+	}
+}
