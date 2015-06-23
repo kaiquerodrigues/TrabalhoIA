@@ -26,7 +26,7 @@ INIT_MINMAX_FLAG = 0;
 
 drawBoard();
 validPlays = calculateValidPlays(pieces);
-//IAvsIA();
+IAvsIA();
 
 //Draw the board
 function drawBoard(){
@@ -136,13 +136,13 @@ function makeMovement(event){
 	var col = Math.floor(y / pieceSize) ;
 	var row = Math.floor(x / pieceSize) ;
 	// Check if it's turn of IA or Player;
-	if (turn==1){
-		play(row,col);
-	}
-	if (turn==0){
-		var pos = minMax(MINMAX_DEPTH,INIT_MINMAX_FLAG,pieces,validPlays);
-		play(pos[0],pos[1]);
-	}
+	// if (turn==1){
+	// 	play(row,col);
+	// }
+	// if (turn==0){
+	// 	var pos = minMax(MINMAX_DEPTH,INIT_MINMAX_FLAG,pieces,validPlays);
+	// 	play(pos[0],pos[1]);
+	// }
 }
 
 function updateGUI(){
@@ -453,13 +453,12 @@ function IAvsIA (){
 	var currentTurn = turn;
 	while(validPlays.length != 0){
 		if (turn!=currentTurn){
-			var pos = minMax(MINMAX_DEPTH,INIT_MINMAX_FLAG,pieces,validPlays);
+			var pos = minMaxIA1(0,INIT_MINMAX_FLAG,pieces,validPlays);
 			play(pos[0],pos[1]);
 		}else{
-			var pos = minMax(MINMAX_DEPTH,INIT_MINMAX_FLAG,pieces,validPlays);
+			var pos = minMaxIA1(0,INIT_MINMAX_FLAG,pieces,validPlays);
 			play(pos[0],pos[1]);
 		}
-		alert("");
 	}
 }
 
@@ -494,7 +493,7 @@ function minMaxIA1(depth, flagMinMax, board, possiblePlays){
 		var board;
 		for (var i=0; i<possiblePlays.length; i++){
 			board = jQuery.extend(true,{}, possiblePlays[i]);
-			newValue = minMax(depth-1, (flagMinMax+1)%2, board, calculateValidPlays(board));
+			newValue = minMaxIA1(depth-1, (flagMinMax+1)%2, board, calculateValidPlays(board));
 			if (flagMinMax==0){
 				if (currentValue[2]<=newValue[2]){
 					currentValue[2] = newValue[2];
@@ -560,7 +559,7 @@ function minMaxIA2(depth, flagMinMax, board, possiblePlays){
 		var board;
 		for (var i=0; i<possiblePlays.length; i++){
 			board = jQuery.extend(true,{}, possiblePlays[i]);
-			newValue = minMax(depth-1, (flagMinMax+1)%2, board, calculateValidPlays(board));
+			newValue = minMaxIA1(depth-1, (flagMinMax+1)%2, board, calculateValidPlays(board));
 			if (flagMinMax==0){
 				if (currentValue[2]<=newValue[2]){
 					currentValue[2] = newValue[2];
