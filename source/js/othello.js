@@ -473,7 +473,73 @@ function calculateMaxBoardValue(){
 	return value;
 }
 
-function minMax(depth, flagMinMax, board, possiblePlays){
+function minMaxIA1(depth, flagMinMax, board, possiblePlays){
+	var currentValue;
+	if (depth>0){
+		if (possiblePlays.length==0){
+			var pos = checkPos(board);
+			var value;
+			if (flagMinMax == 0){
+				value = 0;
+			}
+			else{
+				value = calculateMaxBoardValue();
+			}
+			currentValue = [pos[0],pos[1],value];
+		}
+		else{
+			currentValue = evaluateIA1(flagMinMax,[possiblePlays[0]]);
+		}
+		var index=0;
+		var board;
+		for (var i=0; i<possiblePlays.length; i++){
+			board = jQuery.extend(true,{}, possiblePlays[i]);
+			newValue = minMax(depth-1, (flagMinMax+1)%2, board, calculateValidPlays(board));
+			if (flagMinMax==0){
+				if (currentValue[2]<=newValue[2]){
+					currentValue[2] = newValue[2];
+					index =i;
+				}
+			}
+			if (flagMinMax==1){
+				if (currentValue[2]>=newValue[2]){
+					currentValue[2] = newValue[2];
+					index=i;
+				}
+			}
+		}
+		if (possiblePlays.length!=0){
+			for (i=0; i<n; i++){
+				for (j=0; j<n; j++){
+					if (possiblePlays[index][i][j]==equivalent(turn) && (pieces[i][j]=="e")){
+						currentValue[0] = i;
+						currentValue[1] = j;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		if (possiblePlays.length==0){
+			var pos = checkPos(board);
+			var value;
+			if (flagMinMax == 0){
+				value = 0;
+			}
+			else{
+				value = calculateMaxBoardValue();
+			}
+			currentValue = [pos[0],pos[1],value];
+		}
+		else{
+			var currentValue = evaluateIA2(flagMinMax,possiblePlays);
+		}
+	}
+	return currentValue;
+}
+
+function minMaxIA2(depth, flagMinMax, board, possiblePlays){
 	var currentValue;
 	if (depth>0){
 		if (possiblePlays.length==0){
