@@ -424,6 +424,7 @@ function evaluateIA1(flagMinMax, plays){
 	return -1;
 }
 
+// Evaluate all pieces of a player. Each piece has a value depending on board position
 function evaluateIA2(flagMinMax, plays){
 	var minmax = [0,calculateMaxBoardValue()];
 	var index = [-1,-1];
@@ -449,6 +450,7 @@ function evaluateIA2(flagMinMax, plays){
 	return -1;
 }
 
+// function to put two IAs to play
 function IAvsIA (){
 	var currentTurn = turn;
 	while(validPlays.length != 0){
@@ -472,6 +474,7 @@ function calculateMaxBoardValue(){
 	return value;
 }
 
+// Calculate the best or worse possible play
 function minMax(depth, flagMinMax, board, possiblePlays){
 	var currentValue;
 	if (depth>0){
